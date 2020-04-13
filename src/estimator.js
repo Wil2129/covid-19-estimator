@@ -1,21 +1,40 @@
+const timeToElapseInDays = (timeToElapse, periodType) => {
+  switch (periodType) {
+    case 'days':
+      return timeToElapse;
+
+    case 'weeks':
+      return timeToElapse * 7;
+
+    case 'months':
+      return timeToElapse * 30;
+
+    default:
+      return null;
+  }
+};
+
 const impactEstimator = (impact, data) => {
   const { currentlyInfected } = impact;
-  const { timeToElapse, totalHospitalBeds, region } = data;
+  const {
+    timeToElapse, periodType, totalHospitalBeds, region
+  } = data;
   const { avgDailyIncomeInUSD, avgDailyIncomePopulation } = region;
-  const infectionsByRequestedTime = currentlyInfected * Math.floor(timeToElapse / 3);
+  const daysToElapse = timeToElapseInDays(timeToElapse, periodType);
+  const infectionsByRequestedTime = currentlyInfected * (2 ** Math.floor(daysToElapse / 3));
   const severeCasesByRequestedTime = Math.floor(
     infectionsByRequestedTime * 0.15
   );
   const hospitalBedsByRequestedTime = Math.floor(
-    totalHospitalBeds * 0.35 - severeCasesByRequestedTime
+    (totalHospitalBeds * 0.35) - severeCasesByRequestedTime
   );
-  const casesForICUByRequestedTime = infectionsByRequestedTime * 0.05;
-  const casesForVentilatorsByRequestedTime = infectionsByRequestedTime * 0.02;
+  const casesForICUByRequestedTime = Math.floor(infectionsByRequestedTime * 0.05);
+  const casesForVentilatorsByRequestedTime = Math.floor(infectionsByRequestedTime * 0.02);
   const dollarsInFlight = Math.floor(
     (infectionsByRequestedTime
       * avgDailyIncomeInUSD
       * avgDailyIncomePopulation)
-      / timeToElapse
+      / daysToElapse
   );
   return {
     ...impact,
