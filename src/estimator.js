@@ -21,16 +21,16 @@ const impactEstimator = (impact, data) => {
   } = data;
   const { avgDailyIncomeInUSD, avgDailyIncomePopulation } = region;
   const daysToElapse = timeToElapseInDays(timeToElapse, periodType);
-  const infectionsByRequestedTime = currentlyInfected * (2 ** Math.floor(daysToElapse / 3));
-  const severeCasesByRequestedTime = Math.floor(
+  const infectionsByRequestedTime = currentlyInfected * (2 ** Math.trunc(daysToElapse / 3));
+  const severeCasesByRequestedTime = Math.trunc(
     infectionsByRequestedTime * 0.15
   );
-  const hospitalBedsByRequestedTime = Math.floor(
+  const hospitalBedsByRequestedTime = Math.trunc(
     (totalHospitalBeds * 0.35) - severeCasesByRequestedTime
   );
-  const casesForICUByRequestedTime = Math.floor(infectionsByRequestedTime * 0.05);
-  const casesForVentilatorsByRequestedTime = Math.floor(infectionsByRequestedTime * 0.02);
-  const dollarsInFlight = Math.floor(
+  const casesForICUByRequestedTime = Math.trunc(infectionsByRequestedTime * 0.05);
+  const casesForVentilatorsByRequestedTime = Math.trunc(infectionsByRequestedTime * 0.02);
+  const dollarsInFlight = Math.trunc(
     (infectionsByRequestedTime
       * avgDailyIncomeInUSD
       * avgDailyIncomePopulation)
